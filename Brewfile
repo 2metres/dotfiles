@@ -1,7 +1,5 @@
-# Taps
-tap "homebrew/bundle"
-
 # Core CLI tools
+brew "sheldon"          # Fast, configurable shell plugin manager
 brew "bat"              # Better cat with syntax highlighting
 brew "fzf"              # Fuzzy finder
 brew "git-delta"        # Better git diff
