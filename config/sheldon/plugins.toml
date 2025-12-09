@@ -1,0 +1,33 @@
+# Minimal Sheldon configuration for zsh
+# See: https://sheldon.cli.rs
+
+shell = "zsh"
+
+# Deferred loading for faster startup
+[plugins.zsh-defer]
+github = "romkatv/zsh-defer"
+
+# Completions
+[plugins.zsh-completions]
+github = "zsh-users/zsh-completions"
+
+# Autosuggestions (deferred)
+[plugins.zsh-autosuggestions]
+github = "zsh-users/zsh-autosuggestions"
+use = ["{{ name }}.zsh"]
+apply = ["defer"]
+
+# History substring search (deferred)
+[plugins.zsh-history-substring-search]
+github = "zsh-users/zsh-history-substring-search"
+use = ["{{ name }}.zsh"]
+apply = ["defer"]
+
+# Syntax highlighting (must be last, deferred)
+[plugins.zsh-syntax-highlighting]
+github = "zsh-users/zsh-syntax-highlighting"
+apply = ["defer"]
+
+# Templates
+[templates]
+defer = "{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}"

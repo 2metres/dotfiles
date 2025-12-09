@@ -1,39 +1,65 @@
-# Path to Oh My Zsh
-export ZSH="$HOME/.oh-my-zsh"
+# Sheldon plugin manager
+eval "$(sheldon source)"
 
-# Plugins
-plugins=(
-  git
-  yarn
-  npm
-  python
-  zsh-autosuggestions
-  zsh-completions
-  zsh-history-substring-search
-  zsh-syntax-highlighting
-)
-
-source "$ZSH/oh-my-zsh.sh"
-
-# Disable yarn 'y' alias
-unalias y 2>/dev/null || true
-
-# Custom aliases
+# ------------------------------------------------------------------------------
+# Git aliases (only the ones you actually use)
+# ------------------------------------------------------------------------------
+alias ga='git add'
+alias gc='git commit -v'
+alias gco='git checkout'
+alias gp='git push'
+alias gpr='git pull --rebase'
+alias grbc='git rebase --continue'
 alias gs='git status'
 alias gll='git log --graph --pretty=oneline --abbrev-commit'
 
+# ------------------------------------------------------------------------------
+# Directory navigation
+# ------------------------------------------------------------------------------
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+
+# ------------------------------------------------------------------------------
 # Environment variables
+# ------------------------------------------------------------------------------
 export AWS_PROFILE="aidev"
 export DOCKER_HOST="unix://$HOME/.colima/docker.sock"
 
-# PATH additions
+# ------------------------------------------------------------------------------
+# PATH
+# ------------------------------------------------------------------------------
 export PATH="$HOME/.local/bin:$PATH"
 
+# ------------------------------------------------------------------------------
 # Tool initializations
+# ------------------------------------------------------------------------------
 eval "$(starship init zsh)"
 eval "$(fnm env --use-on-cd --shell zsh)"
 
+# ------------------------------------------------------------------------------
+# History configuration
+# ------------------------------------------------------------------------------
+HISTSIZE=10000
+SAVEHIST=10000
+HISTFILE=~/.zsh_history
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+setopt SHARE_HISTORY
+
+# Key bindings for history substring search
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+
+# ------------------------------------------------------------------------------
+# Completion
+# ------------------------------------------------------------------------------
+autoload -Uz compinit
+compinit -C
+
+# ------------------------------------------------------------------------------
 # AWS helper functions
+# ------------------------------------------------------------------------------
 aws:login() {
   aws sso login --sso-session lmg-sso
   export AWS_PROFILE="aidev"

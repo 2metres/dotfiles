@@ -38,40 +38,22 @@ install_packages() {
     brew bundle --file="$DOTFILES_DIR/Brewfile"
 }
 
-# Install Oh My Zsh
-install_omz() {
-    if [ ! -d "$HOME/.oh-my-zsh" ]; then
-        echo "Installing Oh My Zsh..."
-        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+# Initialize Sheldon and lock plugins
+setup_sheldon() {
+    echo "Setting up Sheldon plugin manager..."
+
+    # Create sheldon config directory
+    mkdir -p "$HOME/.config/sheldon"
+
+    # Link sheldon config
+    ln -sf "$DOTFILES_DIR/config/sheldon/plugins.toml" "$HOME/.config/sheldon/plugins.toml"
+
+    # Lock plugins (downloads and caches them)
+    if command -v sheldon &> /dev/null; then
+        echo "Locking Sheldon plugins..."
+        sheldon lock
     else
-        echo "Oh My Zsh already installed"
-    fi
-}
-
-# Install zsh plugins
-install_zsh_plugins() {
-    local plugins_dir="$HOME/.oh-my-zsh/custom/plugins"
-
-    echo "Installing zsh plugins..."
-
-    # zsh-autosuggestions
-    if [ ! -d "$plugins_dir/zsh-autosuggestions" ]; then
-        git clone https://github.com/zsh-users/zsh-autosuggestions "$plugins_dir/zsh-autosuggestions"
-    fi
-
-    # zsh-syntax-highlighting
-    if [ ! -d "$plugins_dir/zsh-syntax-highlighting" ]; then
-        git clone https://github.com/zsh-users/zsh-syntax-highlighting "$plugins_dir/zsh-syntax-highlighting"
-    fi
-
-    # zsh-completions
-    if [ ! -d "$plugins_dir/zsh-completions" ]; then
-        git clone https://github.com/zsh-users/zsh-completions "$plugins_dir/zsh-completions"
-    fi
-
-    # zsh-history-substring-search
-    if [ ! -d "$plugins_dir/zsh-history-substring-search" ]; then
-        git clone https://github.com/zsh-users/zsh-history-substring-search "$plugins_dir/zsh-history-substring-search"
+        echo "Warning: sheldon not found. Run 'brew install sheldon' first."
     fi
 }
 
@@ -111,13 +93,13 @@ main() {
 
     install_homebrew
     install_packages
-    install_omz
-    install_zsh_plugins
     create_symlinks
+    setup_sheldon
 
     echo ""
     echo "=== Installation Complete ==="
-    echo "Please restart your terminal or run: source ~/.zshrc"
+    echo "Restart your shell with:"
+    echo -e "\033[34m  exec zsh\033[0m"
 }
 
 main "$@"
