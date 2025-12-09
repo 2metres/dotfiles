@@ -1,5 +1,17 @@
+# Startup profiling (run: ZSHRC_PROFILE=1 exec zsh)
+if [[ -n "$ZSHRC_PROFILE" ]]; then
+  zmodload zsh/datetime
+  typeset -g _zshrc_start=$EPOCHREALTIME
+  _profile() { printf "  %-25s %6.0fms\n" "$1" $(( ($EPOCHREALTIME - _zshrc_start) * 1000 )); }
+else
+  _profile() {}
+fi
+
+# ------------------------------------------------------------------------------
 # Sheldon plugin manager
+# ------------------------------------------------------------------------------
 eval "$(sheldon source)"
+_profile "sheldon"
 
 # ------------------------------------------------------------------------------
 # Git aliases (only the ones you actually use)
@@ -23,7 +35,6 @@ alias ....='cd ../../..'
 # ------------------------------------------------------------------------------
 # Environment variables
 # ------------------------------------------------------------------------------
-export AWS_PROFILE="aidev"
 export DOCKER_HOST="unix://$HOME/.colima/docker.sock"
 
 # ------------------------------------------------------------------------------
@@ -35,7 +46,10 @@ export PATH="$HOME/.local/bin:$PATH"
 # Tool initializations
 # ------------------------------------------------------------------------------
 eval "$(starship init zsh)"
+_profile "starship"
+
 eval "$(fnm env --use-on-cd --shell zsh)"
+_profile "fnm"
 
 # ------------------------------------------------------------------------------
 # History configuration
@@ -56,25 +70,17 @@ bindkey '^[[B' history-substring-search-down
 # ------------------------------------------------------------------------------
 autoload -Uz compinit
 compinit -C
+_profile "compinit"
 
 # ------------------------------------------------------------------------------
-# AWS helper functions
+# Utils
 # ------------------------------------------------------------------------------
-aws:login() {
-  aws sso login --sso-session lmg-sso
-  export AWS_PROFILE="aidev"
-  echo "AWS SSO session started and AWS_PROFILE set to aidev."
-}
+DOTFILES_DIR="$(dirname "$(dirname "$(readlink -f ~/.zshrc)")")"
+source "$DOTFILES_DIR/utils/aws.sh"
 
-aws:check-sso() {
-  if aws sts get-caller-identity --output text --query 'Account' >/dev/null 2>&1; then
-    echo "AWS SSO session is active (Profile: $AWS_PROFILE)"
-    return 0
-  else
-    echo "AWS SSO session expired. Run 'aws:login' to authenticate."
-    return 1
-  fi
-}
-
-# Silent SSO check on startup
-aws:check-sso >/dev/null 2>&1
+# ------------------------------------------------------------------------------
+# Finish profiling
+# ------------------------------------------------------------------------------
+_profile "total"
+[[ -n "$ZSHRC_PROFILE" ]] && echo ""
+unfunction _profile 2>/dev/null
