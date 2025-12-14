@@ -57,6 +57,51 @@ setup_sheldon() {
     fi
 }
 
+# Prompt for user info and configure git
+configure_git_user() {
+    echo "Configuring Git user information..."
+    echo ""
+
+    # Check if already configured
+    current_name=$(git config --global user.name 2>/dev/null || echo "")
+    current_email=$(git config --global user.email 2>/dev/null || echo "")
+
+    if [[ -n "$current_name" && -n "$current_email" ]]; then
+        echo "Current Git config:"
+        echo "  Name:  $current_name"
+        echo "  Email: $current_email"
+        echo ""
+        read -p "Keep existing configuration? [Y/n] " keep_config
+        if [[ "$keep_config" =~ ^[Yy]?$ ]]; then
+            return
+        fi
+    fi
+
+    # Prompt for name
+    read -p "Enter your full name for Git commits: " git_name
+    while [[ -z "$git_name" ]]; do
+        echo "Name cannot be empty."
+        read -p "Enter your full name for Git commits: " git_name
+    done
+
+    # Prompt for email
+    read -p "Enter your email for Git commits: " git_email
+    while [[ -z "$git_email" || ! "$git_email" =~ ^[^@]+@[^@]+\.[^@]+$ ]]; do
+        echo "Please enter a valid email address."
+        read -p "Enter your email for Git commits: " git_email
+    done
+
+    # Update gitconfig file with user info
+    sed -i.bak "s/<your_name>/$git_name/" "$DOTFILES_DIR/git/gitconfig"
+    sed -i.bak "s/<your_email>/$git_email/" "$DOTFILES_DIR/git/gitconfig"
+    rm -f "$DOTFILES_DIR/git/gitconfig.bak"
+
+    echo ""
+    echo "Git configured with:"
+    echo "  Name:  $git_name"
+    echo "  Email: $git_email"
+}
+
 # Create symlinks
 create_symlinks() {
     echo "Creating symlinks..."
@@ -91,6 +136,7 @@ main() {
     echo "OS detected: $OS"
     echo ""
 
+    configure_git_user
     install_homebrew
     install_packages
     create_symlinks
