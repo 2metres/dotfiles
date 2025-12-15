@@ -30,4 +30,5 @@ apply = ["defer"]
 
 # Templates
 [templates]
-defer = "{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}"
+
+defer = "{{ hooks?.pre | nl }}{% for file in files %}zsh-defer source \"{{ file }}\"\n{% endfor %}{{ hooks?.post | nl }}"

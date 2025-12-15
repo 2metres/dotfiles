@@ -10,6 +10,7 @@ brew "fnm"              # Fast Node Manager
 # Development
 brew "gh"               # GitHub CLI
 brew "go"               # Go programming language
+brew "uv"               # Fast Python package manager
 
 # Docker (using Colima for lightweight Docker on macOS)
 brew "colima"

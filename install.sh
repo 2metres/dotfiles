@@ -55,6 +55,30 @@ setup_sheldon() {
     else
         echo "Warning: sheldon not found. Run 'brew install sheldon' first."
     fi
+
+    # Prompt for name
+    read -p "Enter your full name for Git commits: " git_name
+    while [[ -z "$git_name" ]]; do
+        echo "Name cannot be empty."
+        read -p "Enter your full name for Git commits: " git_name
+    done
+
+    # Prompt for email
+    read -p "Enter your email for Git commits: " git_email
+    while [[ -z "$git_email" || ! "$git_email" =~ ^[^@]+@[^@]+\.[^@]+$ ]]; do
+        echo "Please enter a valid email address."
+        read -p "Enter your email for Git commits: " git_email
+    done
+
+    # Update gitconfig file with user info
+    sed -i.bak "s/<your_name>/$git_name/" "$DOTFILES_DIR/git/gitconfig"
+    sed -i.bak "s/<your_email>/$git_email/" "$DOTFILES_DIR/git/gitconfig"
+    rm -f "$DOTFILES_DIR/git/gitconfig.bak"
+
+    echo ""
+    echo "Git configured with:"
+    echo "  Name:  $git_name"
+    echo "  Email: $git_email"
 }
 
 # Prompt for user info and configure git
